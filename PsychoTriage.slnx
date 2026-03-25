@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PsychoTriage.Api/PsychoTriage.Api.csproj" />
+  <Project Path="PsychoTriage.Application/PsychoTriage.Application.csproj" />
+  <Project Path="PsychoTriage.Domain/PsychoTriage.Domain.csproj" />
+  <Project Path="PsychoTriage.Infrastructure/PsychoTriage.Infrastructure.csproj" />
+</Solution>

@@ -1,0 +1,11 @@
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\bin\Debug\net10.0\PsychoTriage.Domain.deps.json
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\bin\Debug\net10.0\PsychoTriage.Domain.dll
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\bin\Debug\net10.0\PsychoTriage.Domain.pdb
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\PsychoTriage.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\PsychoTriage.Domain.AssemblyInfoInputs.cache
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\PsychoTriage.Domain.AssemblyInfo.cs
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\PsychoTriage.Domain.csproj.CoreCompileInputs.cache
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\PsychoTriage.Domain.dll
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\refint\PsychoTriage.Domain.dll
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\PsychoTriage.Domain.pdb
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\ref\PsychoTriage.Domain.dll
