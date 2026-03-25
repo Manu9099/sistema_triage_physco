@@ -9,3 +9,4 @@ C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\De
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\refint\PsychoTriage.Domain.dll
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\PsychoTriage.Domain.pdb
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\ref\PsychoTriage.Domain.dll
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Domain\obj\Debug\net10.0\PsychoTriage.Domain.sourcelink.json

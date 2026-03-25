@@ -128,3 +128,4 @@ C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.pdb
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.genruntimeconfig.cache
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\ref\PsychoTriage.Api.dll
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.sourcelink.json

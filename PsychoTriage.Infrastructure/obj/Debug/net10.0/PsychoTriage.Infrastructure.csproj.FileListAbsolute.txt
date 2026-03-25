@@ -17,3 +17,4 @@ C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Infrastructur
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Infrastructure\obj\Debug\net10.0\PsychoTriage.Infrastructure.pdb
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Infrastructure\obj\Debug\net10.0\PsychoTriage.Infrastructure.genruntimeconfig.cache
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Infrastructure\obj\Debug\net10.0\ref\PsychoTriage.Infrastructure.dll
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Infrastructure\obj\Debug\net10.0\PsychoTriage.Infrastructure.sourcelink.json

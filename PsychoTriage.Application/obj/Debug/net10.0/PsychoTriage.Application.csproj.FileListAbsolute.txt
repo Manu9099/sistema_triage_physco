@@ -13,3 +13,4 @@ C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\o
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\refint\PsychoTriage.Application.dll
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.pdb
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\ref\PsychoTriage.Application.dll
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.sourcelink.json
