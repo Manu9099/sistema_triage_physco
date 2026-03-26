@@ -1,3 +1,4 @@
+using FluentValidation;
 using PsychoTriage.Application.Services;
 using PsychoTriage.Application.Tests.Support;
 using PsychoTriage.Application.Validators;
@@ -16,135 +17,7 @@ public class TriageServiceBoundaryTests
     }
 
     [Fact]
-    public async Task EvaluateAsync_WhenComputedScoreIsExactly14_ShouldReturnRoutine()
-    {
-        var repo = new FakeTriageEvaluationRepository();
-        var sut = CreateSut(repo);
-
-        var request = TestData.ValidRequest(
-            phq9: new[] { 1, 1, 1, 1, 1, 1, 1, 0, 0 },   // 7
-            gad7: new[] { 1, 1, 1, 1, 1, 1, 0 },         // 6
-            socialSupportLevel: 4,                       // +0
-            substanceUse: false,
-            functionalImpairment: false);               // total 13? no, 7+6=13
-
-        request.Gad7Answers = new[] { 1, 1, 1, 1, 1, 1, 1 }.ToList(); // 7
-        // total = 14
-
-        var result = await sut.EvaluateAsync(request);
-
-        Assert.Equal("Rutinario", result.UrgencyLevel);
-    }
-
-    [Fact]
-    public async Task EvaluateAsync_WhenComputedScoreIsExactly15_ShouldReturnPriority()
-    {
-        var repo = new FakeTriageEvaluationRepository();
-        var sut = CreateSut(repo);
-
-        var request = TestData.ValidRequest(
-            phq9: new[] { 1, 1, 1, 1, 1, 1, 1, 0, 0 },   // 7
-            gad7: new[] { 1, 1, 1, 1, 1, 1, 1 },         // 7
-            socialSupportLevel: 3);                      // +3 => total 17? no
-
-        request.Gad7Answers = new[] { 1, 1, 1, 1, 0, 0, 0 }.ToList(); // 4
-        // 7 + 4 + 3 = 14? no
-
-        request.Phq9Answers = new[] { 1, 1, 1, 1, 1, 1, 1, 0, 0 }.ToList(); // 7
-        request.Gad7Answers = new[] { 1, 1, 1, 1, 1, 0, 0 }.ToList();       // 5
-        request.SocialSupportLevel = 3;                                      // +3
-        // total = 15
-
-        var result = await sut.EvaluateAsync(request);
-
-        Assert.Equal("Prioridad", result.UrgencyLevel);
-    }
-
-    [Fact]
-    public async Task EvaluateAsync_WhenComputedScoreIsExactly24_ShouldReturnPriority()
-    {
-        var repo = new FakeTriageEvaluationRepository();
-        var sut = CreateSut(repo);
-
-        var request = TestData.ValidRequest(
-            phq9: new[] { 2, 2, 1, 1, 1, 1, 1, 1, 1 },   // 11
-            gad7: new[] { 2, 2, 2, 1, 1, 1, 1 },         // 10
-            socialSupportLevel: 4,
-            substanceUse: true);                         // +3 => total 24
-
-        var result = await sut.EvaluateAsync(request);
-
-        Assert.Equal("Prioridad", result.UrgencyLevel);
-    }
-
-    [Fact]
-    public async Task EvaluateAsync_WhenComputedScoreIsExactly25_ShouldReturnUrgent()
-    {
-        var repo = new FakeTriageEvaluationRepository();
-        var sut = CreateSut(repo);
-
-        var request = TestData.ValidRequest(
-            phq9: new[] { 2, 2, 2, 1, 1, 1, 1, 1, 1 },   // 12
-            gad7: new[] { 2, 2, 2, 1, 1, 1, 1 },         // 10
-            socialSupportLevel: 4,
-            substanceUse: true);                         // +3 => total 25
-
-        var result = await sut.EvaluateAsync(request);
-
-        Assert.Equal("Urgente", result.UrgencyLevel);
-    }
-
-    [Fact]
-    public async Task EvaluateAsync_WhenSocialSupportIsExactly3_ShouldAddRiskBonus()
-    {
-        var repo = new FakeTriageEvaluationRepository();
-        var sut = CreateSut(repo);
-
-        var request = TestData.ValidRequest(
-            phq9: new[] { 1, 1, 1, 1, 1, 1, 1, 0, 0 },   // 7
-            gad7: new[] { 1, 1, 1, 1, 1, 0, 0 },         // 5
-            socialSupportLevel: 3);                      // +3 => total 15
-
-        var result = await sut.EvaluateAsync(request);
-
-        Assert.Equal("Prioridad", result.UrgencyLevel);
-    }
-
-    [Fact]
-    public async Task EvaluateAsync_WhenSocialSupportIsExactly4_ShouldNotAddRiskBonus()
-    {
-        var repo = new FakeTriageEvaluationRepository();
-        var sut = CreateSut(repo);
-
-        var request = TestData.ValidRequest(
-            phq9: new[] { 1, 1, 1, 1, 1, 1, 1, 0, 0 },   // 7
-            gad7: new[] { 1, 1, 1, 1, 1, 0, 0 },         // 5
-            socialSupportLevel: 4);                      // +0 => total 12
-
-        var result = await sut.EvaluateAsync(request);
-
-        Assert.Equal("Rutinario", result.UrgencyLevel);
-    }
-
-    [Fact]
-    public async Task EvaluateAsync_WhenFunctionalImpairmentIsTrue_ShouldAddFourPoints()
-    {
-        var repo = new FakeTriageEvaluationRepository();
-        var sut = CreateSut(repo);
-
-        var request = TestData.ValidRequest(
-            phq9: new[] { 1, 1, 1, 1, 1, 1, 1, 0, 0 },   // 7
-            gad7: new[] { 1, 1, 1, 1, 1, 0, 0 },         // 5
-            functionalImpairment: true,
-            socialSupportLevel: 4);                      // +4 => total 16
-
-        var result = await sut.EvaluateAsync(request);
-
-        Assert.Equal("Prioridad", result.UrgencyLevel);
-    }
-
-    [Fact]
-    public async Task EvaluateAsync_WhenSuicidalIdeationIsTrue_ShouldOverrideLowScoreAndReturnCritical()
+    public async Task EvaluateAsync_WhenSuicidalIdeationIsTrue_ShouldReturnCritical()
     {
         var repo = new FakeTriageEvaluationRepository();
         var sut = CreateSut(repo);
@@ -152,27 +25,24 @@ public class TriageServiceBoundaryTests
         var request = TestData.ValidRequest(
             phq9: new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             gad7: new[] { 0, 0, 0, 0, 0, 0, 0 },
-            suicidalIdeation: true,
-            socialSupportLevel: 10);
+            suicidalIdeation: true);
 
         var result = await sut.EvaluateAsync(request);
 
         Assert.Equal("Crítico", result.UrgencyLevel);
         Assert.Equal("Alto riesgo", result.ClinicalProfile);
+        Assert.Contains("ideación suicida=sí", result.Summary);
     }
 
     [Fact]
-    public async Task EvaluateAsync_WhenSelfHarmHistoryAndFunctionalImpairmentAreTrue_ShouldOverrideLowScoreAndReturnUrgent()
+    public async Task EvaluateAsync_WhenSelfHarmHistoryAndFunctionalImpairment_ShouldReturnUrgent()
     {
         var repo = new FakeTriageEvaluationRepository();
         var sut = CreateSut(repo);
 
         var request = TestData.ValidRequest(
-            phq9: new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            gad7: new[] { 0, 0, 0, 0, 0, 0, 0 },
             selfHarmHistory: true,
-            functionalImpairment: true,
-            socialSupportLevel: 10);
+            functionalImpairment: true);
 
         var result = await sut.EvaluateAsync(request);
 
@@ -181,29 +51,148 @@ public class TriageServiceBoundaryTests
     }
 
     [Fact]
-    public async Task EvaluateAsync_Summary_ShouldContainExpectedFieldsOnly()
+    public async Task EvaluateAsync_WhenPhq9IsTwentyOrMore_ShouldReturnUrgent()
     {
         var repo = new FakeTriageEvaluationRepository();
         var sut = CreateSut(repo);
 
         var request = TestData.ValidRequest(
-            phq9: new[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 },   // 9
-            gad7: new[] { 1, 1, 1, 1, 1, 1, 1 },         // 7
-            functionalImpairment: true,
-            suicidalIdeation: false,
-            selfHarmHistory: true,
-            substanceUse: true,
+            phq9: new[] { 3, 3, 2, 2, 2, 2, 2, 2, 2 }, // 20
+            gad7: new[] { 0, 0, 0, 0, 0, 0, 0 });
+
+        var result = await sut.EvaluateAsync(request);
+
+        Assert.Equal("Urgente", result.UrgencyLevel);
+        Assert.Equal("Depresión", result.ClinicalProfile);
+        Assert.Contains("PHQ-9=20", result.Summary);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WhenPhq9IsFifteenWithoutFunctionalImpairment_ShouldReturnPriority()
+    {
+        var repo = new FakeTriageEvaluationRepository();
+        var sut = CreateSut(repo);
+
+        var request = TestData.ValidRequest(
+            phq9: new[] { 2, 2, 2, 2, 2, 2, 1, 1, 1 }, // 15
+            gad7: new[] { 0, 0, 0, 0, 0, 0, 0 },
+            functionalImpairment: false);
+
+        var result = await sut.EvaluateAsync(request);
+
+        Assert.Equal("Prioridad", result.UrgencyLevel);
+        Assert.Equal("Depresión", result.ClinicalProfile);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WhenGad7IsFifteenWithFunctionalImpairment_ShouldReturnUrgent()
+    {
+        var repo = new FakeTriageEvaluationRepository();
+        var sut = CreateSut(repo);
+
+        var request = TestData.ValidRequest(
+            phq9: new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            gad7: new[] { 3, 2, 2, 2, 2, 2, 2 }, // 15
+            functionalImpairment: true);
+
+        var result = await sut.EvaluateAsync(request);
+
+        Assert.Equal("Urgente", result.UrgencyLevel);
+        Assert.Equal("Ansiedad", result.ClinicalProfile);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WhenModerateSymptomsAndFunctionalImpairment_ShouldReturnPriority()
+    {
+        var repo = new FakeTriageEvaluationRepository();
+        var sut = CreateSut(repo);
+
+        var request = TestData.ValidRequest(
+            phq9: new[] { 2, 1, 1, 1, 1, 1, 1, 1, 1 }, // 10
+            gad7: new[] { 0, 0, 0, 0, 0, 0, 0 },
+            functionalImpairment: true);
+
+        var result = await sut.EvaluateAsync(request);
+
+        Assert.Equal("Prioridad", result.UrgencyLevel);
+        Assert.Equal("Depresión", result.ClinicalProfile);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WhenModerateSymptomsAndLowSocialSupport_ShouldReturnPriority()
+    {
+        var repo = new FakeTriageEvaluationRepository();
+        var sut = CreateSut(repo);
+
+        var request = TestData.ValidRequest(
+            phq9: new[] { 2, 1, 1, 1, 1, 1, 1, 1, 1 }, // 10
+            gad7: new[] { 0, 0, 0, 0, 0, 0, 0 },
             socialSupportLevel: 2);
 
         var result = await sut.EvaluateAsync(request);
 
-        Assert.Contains("PHQ-9=9", result.Summary);
-        Assert.Contains("GAD-7=7", result.Summary);
-        Assert.Contains("deterioro funcional=sí", result.Summary);
-        Assert.Contains("ideación suicida=no", result.Summary);
+        Assert.Equal("Prioridad", result.UrgencyLevel);
+        Assert.Equal("Depresión", result.ClinicalProfile);
+        Assert.Contains("soporte social=bajo", result.Summary);
+    }
 
-        Assert.DoesNotContain("autoles", result.Summary, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("sustanc", result.Summary, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("soporte", result.Summary, StringComparison.OrdinalIgnoreCase);
+    [Fact]
+    public async Task EvaluateAsync_WhenModerateSymptomsAndSubstanceUse_ShouldReturnPriority()
+    {
+        var repo = new FakeTriageEvaluationRepository();
+        var sut = CreateSut(repo);
+
+        var request = TestData.ValidRequest(
+            phq9: new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            gad7: new[] { 2, 1, 1, 1, 1, 1, 3 }, // 10
+            substanceUse: true);
+
+        var result = await sut.EvaluateAsync(request);
+
+        Assert.Equal("Prioridad", result.UrgencyLevel);
+        Assert.Equal("Ansiedad", result.ClinicalProfile);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WhenBothPhq9AndGad7AreTenOrMore_ShouldReturnMixedProfile()
+    {
+        var repo = new FakeTriageEvaluationRepository();
+        var sut = CreateSut(repo);
+
+        var request = TestData.ValidRequest(
+            phq9: new[] { 2, 1, 1, 1, 1, 1, 1, 1, 1 }, // 10
+            gad7: new[] { 2, 1, 1, 1, 1, 2, 2 });      // 10
+
+        var result = await sut.EvaluateAsync(request);
+
+        Assert.Equal("Prioridad", result.UrgencyLevel);
+        Assert.Equal("Ansioso-depresivo mixto", result.ClinicalProfile);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WhenSymptomsAreMildAndNoRedFlags_ShouldReturnRoutine()
+    {
+        var repo = new FakeTriageEvaluationRepository();
+        var sut = CreateSut(repo);
+
+        var request = TestData.ValidRequest(
+            phq9: new[] { 1, 1, 1, 0, 0, 0, 0, 0, 0 }, // 3
+            gad7: new[] { 1, 1, 1, 1, 0, 0, 0 });      // 4
+
+        var result = await sut.EvaluateAsync(request);
+
+        Assert.Equal("Rutinario", result.UrgencyLevel);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WhenRequestIsInvalid_ShouldThrowValidationException()
+    {
+        var repo = new FakeTriageEvaluationRepository();
+        var sut = CreateSut(repo);
+
+        var request = TestData.ValidRequest(age: 3);
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.EvaluateAsync(request));
+        Assert.Empty(repo.SavedItems);
     }
 }

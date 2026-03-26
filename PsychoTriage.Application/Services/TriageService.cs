@@ -2,7 +2,6 @@ using FluentValidation;
 using PsychoTriage.Application.DTOs;
 using PsychoTriage.Application.Interfaces;
 using PsychoTriage.Domain.Entities;
-using PsychoTriage.Domain.Enums;
 using PsychoTriage.Application.Common;
 
 namespace PsychoTriage.Application.Services;
@@ -27,100 +26,55 @@ public class TriageService : ITriageService
     }
 
     public async Task<TriageResultDto> EvaluateAsync(
-        TriageRequestDto request,
-        CancellationToken cancellationToken = default)
+    TriageRequestDto request,
+    CancellationToken cancellationToken = default)
+{
+    var validation = await _validator.ValidateAsync(request, cancellationToken);
+    if (!validation.IsValid)
     {
-        var validation = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validation.IsValid)
-        {
-            throw new ValidationException(validation.Errors);
-        }
-
-        int phq9 = _scoringService.CalculatePhq9(request.Phq9Answers);
-        int gad7 = _scoringService.CalculateGad7(request.Gad7Answers);
-
-        var urgency = CalculateUrgency(request, phq9, gad7);
-        var profile = CalculateProfile(request, phq9, gad7);
-
-        var summary = $"PHQ-9={phq9}, GAD-7={gad7}, " +
-                      $"deterioro funcional={(request.FunctionalImpairment ? "sí" : "no")}, " +
-                      $"ideación suicida={(request.SuicidalIdeation ? "sí" : "no")}.";
-
-        var recommendation = urgency switch
-        {
-            UrgencyLevel.Critical => "Evaluación inmediata y activación de protocolo de seguridad.",
-            UrgencyLevel.Urgent => "Atención prioritaria en menos de 24 horas.",
-            UrgencyLevel.Priority => "Programar evaluación en 48-72 horas.",
-            _ => "Seguimiento rutinario y reevaluación clínica."
-        };
-
-        var entity = new TriageEvaluation
-        {
-            Age = request.Age,
-            Phq9Score = phq9,
-            Gad7Score = gad7,
-            SuicidalIdeation = request.SuicidalIdeation,
-            SelfHarmHistory = request.SelfHarmHistory,
-            FunctionalImpairment = request.FunctionalImpairment,
-            SubstanceUse = request.SubstanceUse,
-            SocialSupportLevel = request.SocialSupportLevel,
-            UrgencyLevel = urgency,
-            ClinicalProfile = profile,
-            Summary = summary,
-            Recommendation = recommendation
-        };
-
-        await _repository.AddAsync(entity, cancellationToken);
-
-            return new TriageResultDto
-            {
-                Phq9Score = phq9,
-                Gad7Score = gad7,
-                UrgencyLevel = urgency.ToSpanish(),
-                ClinicalProfile = profile.ToSpanish(),
-                Summary = summary,
-                Recommendation = recommendation
-            };
+        throw new ValidationException(validation.Errors);
     }
 
-    private static UrgencyLevel CalculateUrgency(TriageRequestDto request, int phq9, int gad7)
+    int phq9 = _scoringService.CalculatePhq9(request.Phq9Answers);
+    int gad7 = _scoringService.CalculateGad7(request.Gad7Answers);
+
+    var urgency = TriageClinicalRules.CalculateUrgency(request, phq9, gad7);
+    var profile = TriageClinicalRules.CalculateProfile(request, phq9, gad7);
+    var summary = TriageClinicalRules.BuildSummary(request, phq9, gad7);
+    var recommendation = TriageClinicalRules.GetRecommendation(urgency);
+
+    var entity = new TriageEvaluation
     {
-        if (request.SuicidalIdeation)
-            return UrgencyLevel.Critical;
+        Age = request.Age,
+        Phq9Score = phq9,
+        Gad7Score = gad7,
+        SuicidalIdeation = request.SuicidalIdeation,
+        SelfHarmHistory = request.SelfHarmHistory,
+        FunctionalImpairment = request.FunctionalImpairment,
+        SubstanceUse = request.SubstanceUse,
+        SocialSupportLevel = request.SocialSupportLevel,
+        UrgencyLevel = urgency,
+        ClinicalProfile = profile,
+        Summary = summary,
+        Recommendation = recommendation
+    };
 
-        if (request.SelfHarmHistory && request.FunctionalImpairment)
-            return UrgencyLevel.Urgent;
+    await _repository.AddAsync(entity, cancellationToken);
 
-        int score = phq9 + gad7;
-
-        if (request.FunctionalImpairment) score += 4;
-        if (request.SubstanceUse) score += 3;
-        if (request.SocialSupportLevel <= 3) score += 3;
-
-        if (score >= 25) return UrgencyLevel.Urgent;
-        if (score >= 15) return UrgencyLevel.Priority;
-        return UrgencyLevel.Routine;
-    }
-
-    private static ClinicalProfile CalculateProfile(TriageRequestDto request, int phq9, int gad7)
+    return new TriageResultDto
     {
-        if (request.SuicidalIdeation || request.SelfHarmHistory)
-            return ClinicalProfile.HighRisk;
+        Phq9Score = phq9,
+        Gad7Score = gad7,
+        UrgencyLevel = urgency.ToSpanish(),
+        ClinicalProfile = profile.ToSpanish(),
+        Summary = summary,
+        Recommendation = recommendation
+    };
+}
 
-        if (request.SubstanceUse && phq9 < 10 && gad7 < 10)
-            return ClinicalProfile.SubstanceRelated;
 
-        if (phq9 >= 10 && gad7 >= 10)
-            return ClinicalProfile.MixedAnxiousDepressive;
 
-        if (gad7 > phq9)
-            return ClinicalProfile.Anxiety;
 
-        if (phq9 > gad7)
-            return ClinicalProfile.Depression;
-
-        return ClinicalProfile.None;
-    }
    public async Task<IReadOnlyList<TriageListItemDto>> GetAllAsync(CancellationToken cancellationToken = default)
 {
     var evaluations = await _repository.GetAllAsync(cancellationToken);

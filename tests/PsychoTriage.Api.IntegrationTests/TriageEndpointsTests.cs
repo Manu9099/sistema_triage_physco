@@ -11,11 +11,6 @@ public class TriageEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     private readonly CustomWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
     public TriageEndpointsTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
@@ -27,14 +22,15 @@ public class TriageEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task PostEvaluate_WithValidRequest_ShouldReturnOkAndResult()
+    public async Task PostEvaluate_WithValidRequest_ShouldReturnOkAndPriorityResult()
     {
         await _factory.ResetDatabaseAsync();
 
         var request = TestData.ValidRequest(
-            phq9: new[] { 1, 1, 1, 1, 1, 1, 1, 0, 0 },   // 7
-            gad7: new[] { 1, 1, 1, 1, 1, 0, 0 },         // 5
-            socialSupportLevel: 3);                      // +3 => Prioridad
+            phq9: new[] { 2, 1, 1, 1, 1, 1, 1, 1, 1 }, // 10
+            gad7: new[] { 0, 0, 0, 0, 0, 0, 0 },       // 0
+            socialSupportLevel: 2                      // bajo
+        );
 
         var response = await _client.PostAsJsonAsync("/api/triage/evaluate", request);
 
@@ -43,11 +39,20 @@ public class TriageEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         var root = json.RootElement;
 
-        Assert.Equal(7, root.GetProperty("phq9Score").GetInt32());
-        Assert.Equal(5, root.GetProperty("gad7Score").GetInt32());
+        Assert.Equal(10, root.GetProperty("phq9Score").GetInt32());
+        Assert.Equal(0, root.GetProperty("gad7Score").GetInt32());
         Assert.Equal("Prioridad", root.GetProperty("urgencyLevel").GetString());
         Assert.Equal("Depresión", root.GetProperty("clinicalProfile").GetString());
-        Assert.Contains("PHQ-9=7", root.GetProperty("summary").GetString());
+
+        var summary = root.GetProperty("summary").GetString();
+        Assert.NotNull(summary);
+        Assert.Contains("PHQ-9=10 (moderado)", summary);
+        Assert.Contains("GAD-7=0 (mínimo)", summary);
+        Assert.Contains("soporte social=bajo", summary);
+
+        Assert.Equal(
+            "Programar evaluación en 48-72 horas, dar pautas de alarma y reevaluar si hay empeoramiento.",
+            root.GetProperty("recommendation").GetString());
     }
 
     [Fact]
@@ -77,21 +82,36 @@ public class TriageEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 
         var request = TestData.ValidRequest(
             age: 30,
-            phq9: new[] { 2, 2, 2, 1, 1, 1, 1, 1, 1 },
-            gad7: new[] { 1, 1, 1, 1, 1, 1, 1 });
+            phq9: new[] { 2, 2, 2, 1, 1, 1, 1, 1, 1 }, // 12
+            gad7: new[] { 1, 1, 1, 1, 1, 1, 1 },       // 7
+            functionalImpairment: true
+        );
 
         var postResponse = await _client.PostAsJsonAsync("/api/triage/evaluate", request);
         Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
 
-        var getResponse = await _client.GetAsync("/api/triage/1");
+        var listResponse = await _client.GetAsync("/api/triage?page=1&pageSize=10");
+        Assert.Equal(HttpStatusCode.OK, listResponse.StatusCode);
+
+        using var listJson = JsonDocument.Parse(await listResponse.Content.ReadAsStringAsync());
+        var items = listJson.RootElement.GetProperty("items");
+
+        Assert.True(items.GetArrayLength() > 0);
+
+        var createdId = items[0].GetProperty("id").GetInt32();
+
+        var getResponse = await _client.GetAsync($"/api/triage/{createdId}");
 
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
 
         using var json = JsonDocument.Parse(await getResponse.Content.ReadAsStringAsync());
         var root = json.RootElement;
 
-        Assert.Equal(1, root.GetProperty("id").GetInt32());
+        Assert.Equal(createdId, root.GetProperty("id").GetInt32());
         Assert.Equal(30, root.GetProperty("age").GetInt32());
+        Assert.Equal(12, root.GetProperty("phq9Score").GetInt32());
+        Assert.Equal(7, root.GetProperty("gad7Score").GetInt32());
+        Assert.True(root.GetProperty("functionalImpairment").GetBoolean());
         Assert.True(root.TryGetProperty("summary", out _));
         Assert.True(root.TryGetProperty("recommendation", out _));
     }
@@ -136,7 +156,7 @@ public class TriageEndpointsTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task GetPaged_WithUrgencyFilter_ShouldReturnOnlyMatchingItems()
+    public async Task GetPaged_WithUrgencyFilter_ShouldReturnOnlyCriticalItems()
     {
         await _factory.ResetDatabaseAsync();
 
