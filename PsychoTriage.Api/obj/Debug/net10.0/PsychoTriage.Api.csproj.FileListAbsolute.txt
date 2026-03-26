@@ -113,6 +113,7 @@ C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.csproj.CoreCompileInputs.cache
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.sourcelink.json
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
@@ -128,4 +129,3 @@ C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.pdb
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.genruntimeconfig.cache
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\ref\PsychoTriage.Api.dll
-C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Api\obj\Debug\net10.0\PsychoTriage.Api.sourcelink.json

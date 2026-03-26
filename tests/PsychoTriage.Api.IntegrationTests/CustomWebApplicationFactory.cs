@@ -3,39 +3,33 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using PsychoTriage.Infrastructure.Persistence;
 
 namespace PsychoTriage.Api.IntegrationTests;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private DbConnection? _connection;
+    private SqliteConnection? _connection;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
+
         builder.ConfigureServices(services =>
         {
-            var dbContextDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-
-            if (dbContextDescriptor is not null)
-            {
-                services.Remove(dbContextDescriptor);
-            }
-
-            var dbConnectionDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbConnection));
-
-            if (dbConnectionDescriptor is not null)
-            {
-                services.Remove(dbConnectionDescriptor);
-            }
+            services.RemoveAll<DbContextOptions<AppDbContext>>();
+            services.RemoveAll<AppDbContext>();
+            services.RemoveAll<IDbContextOptionsConfiguration<AppDbContext>>();
+            services.RemoveAll<DbConnection>();
 
             _connection = new SqliteConnection("Data Source=:memory:");
             _connection.Open();
 
-            services.AddSingleton(_connection);
+            services.AddSingleton<DbConnection>(_connection);
+
             services.AddDbContext<AppDbContext>((sp, options) =>
             {
                 var connection = sp.GetRequiredService<DbConnection>();
@@ -44,6 +38,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             using var scope = services.BuildServiceProvider().CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
         });
     }
@@ -59,11 +54,11 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void Dispose(bool disposing)
     {
-        base.Dispose(disposing);
-
         if (disposing)
         {
             _connection?.Dispose();
         }
+
+        base.Dispose(disposing);
     }
 }

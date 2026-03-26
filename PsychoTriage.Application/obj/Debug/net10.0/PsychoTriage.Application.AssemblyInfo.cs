@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PsychoTriage.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a2f1140e1624b431974b922b6a17be0344c7b56f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+899fb35837d30d3b23e8d6687620b52f9875cd5f")]
 [assembly: System.Reflection.AssemblyProductAttribute("PsychoTriage.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PsychoTriage.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

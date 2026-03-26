@@ -8,9 +8,9 @@ C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\o
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.AssemblyInfoInputs.cache
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.AssemblyInfo.cs
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.csproj.CoreCompileInputs.cache
+C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.sourcelink.json
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTr.3D9E975C.Up2Date
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.dll
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\refint\PsychoTriage.Application.dll
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.pdb
 C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\ref\PsychoTriage.Application.dll
-C:\Users\manuc\OneDrive\Desktop\sistema_triage_physco\PsychoTriage.Application\obj\Debug\net10.0\PsychoTriage.Application.sourcelink.json

@@ -2324,7 +2324,7 @@
       "Microsoft.EntityFrameworkCore.Design >= 10.0.5",
       "PsychoTriage.Application >= 1.0.0",
       "PsychoTriage.Infrastructure >= 1.0.0",
-      "Swashbuckle.AspNetCore.SwaggerUi >= 10.1.5"
+      "Swashbuckle.AspNetCore.SwaggerUI >= 10.1.5"
     ]
   },
   "packageFolders": {
@@ -2387,7 +2387,7 @@
             "target": "Package",
             "version": "[10.0.5, )"
           },
-          "Swashbuckle.AspNetCore.SwaggerUi": {
+          "Swashbuckle.AspNetCore.SwaggerUI": {
             "target": "Package",
             "version": "[10.1.5, )"
           }
