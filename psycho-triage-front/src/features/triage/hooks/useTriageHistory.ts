@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getTriageHistory } from "../services/triageApi";
 import type { HistoryFilters, PagedResult, TriageListItem } from "../types";
 
-export function useTriageHistory(apiBaseUrl: string, filters: HistoryFilters) {
+export function useTriageHistory(filters: HistoryFilters) {
   const [history, setHistory] = useState<PagedResult<TriageListItem> | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
@@ -12,14 +12,14 @@ export function useTriageHistory(apiBaseUrl: string, filters: HistoryFilters) {
     setHistoryError(null);
 
     try {
-      const data = await getTriageHistory(apiBaseUrl, filters);
+      const data = await getTriageHistory(filters);
       setHistory(data);
     } catch (error) {
       setHistoryError(error instanceof Error ? error.message : "No se pudo cargar el historial.");
     } finally {
       setLoadingHistory(false);
     }
-  }, [apiBaseUrl, filters]);
+  }, [filters]);
 
   useEffect(() => {
     void loadHistory();

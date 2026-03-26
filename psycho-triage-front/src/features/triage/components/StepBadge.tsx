@@ -5,13 +5,9 @@ type Props = {
 };
 
 export default function StepBadge({ index, active, done }: Props) {
-  const className = [
-    "step-badge",
-    active ? "active" : "",
-    done ? "done" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const classes = ["step-badge"];
+  if (active) classes.push("active");
+  if (done) classes.push("done");
 
-  return <div className={className}>{done ? "✓" : index + 1}</div>;
+  return <div className={classes.join(" ")}>{done ? "✓" : index + 1}</div>;
 }

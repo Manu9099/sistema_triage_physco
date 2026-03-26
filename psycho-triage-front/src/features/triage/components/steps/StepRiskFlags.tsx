@@ -36,8 +36,8 @@ const riskItems: Array<{ label: string; key: RiskKey; hint: string }> = [
 
 export default function StepRiskFlags({ form, onToggle }: Props) {
   return (
-    <div style={{ display: "grid", gap: 16 }}>
-      <h3 style={{ margin: 0 }}>Banderas clínicas y funcionamiento</h3>
+    <div className="step-stack">
+      <h3 className="section-title">Banderas clínicas y funcionamiento</h3>
 
       <div className="checkbox-grid">
         {riskItems.map((item) => (
@@ -49,10 +49,8 @@ export default function StepRiskFlags({ form, onToggle }: Props) {
             />
 
             <div>
-              <div style={{ fontWeight: 700 }}>{item.label}</div>
-              <div style={{ color: "var(--text-muted)", fontSize: "0.92rem", marginTop: 4 }}>
-                {item.hint}
-              </div>
+              <div className="checkbox-title">{item.label}</div>
+              <div className="checkbox-hint">{item.hint}</div>
             </div>
           </label>
         ))}

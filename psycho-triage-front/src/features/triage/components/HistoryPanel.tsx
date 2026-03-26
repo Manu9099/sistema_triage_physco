@@ -1,5 +1,6 @@
 import HistoryFiltersComponent from "./HistoryFilters";
 import type { HistoryFilters, PagedResult, TriageListItem } from "../types";
+import { Link } from "react-router";
 
 type Props = {
   filters: HistoryFilters;
@@ -42,11 +43,17 @@ export default function HistoryPanel({
       <div className="history-list">
         {loadingHistory ? (
           <div className="section-card" style={{ color: "var(--text-muted)" }}>
+            
             Cargando historial...
           </div>
         ) : history?.items.length ? (
           history.items.map((item) => (
             <article key={item.id} className="section-card">
+              <div style={{ marginTop: 12 }}>
+            <Link to={`/history/${item.id}`} className="btn btn-secondary">
+              Ver detalle
+            </Link>
+          </div>
               <div className="history-card-head">
                 <div>
                   <div style={{ fontWeight: 700 }}>Evaluación #{item.id}</div>

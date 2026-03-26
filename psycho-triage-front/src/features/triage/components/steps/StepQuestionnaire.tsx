@@ -18,9 +18,9 @@ export default function StepQuestionnaire({
   onChange,
 }: Props) {
   return (
-    <div style={{ display: "grid", gap: 16 }}>
+    <div className="step-stack">
       <div className="history-header">
-        <h3 style={{ margin: 0 }}>{title}</h3>
+        <h3 className="section-title">{title}</h3>
         <span className="tag">Puntaje: {score}</span>
       </div>
 

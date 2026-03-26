@@ -28,6 +28,23 @@ export type TriageListItem = {
   createdAt: string;
 };
 
+export type TriageDetail = {
+  id: number;
+  age: number;
+  phq9Score: number;
+  gad7Score: number;
+  suicidalIdeation: boolean;
+  selfHarmHistory: boolean;
+  functionalImpairment: boolean;
+  substanceUse: boolean;
+  socialSupportLevel: number;
+  urgencyLevel: string;
+  clinicalProfile: string;
+  summary: string;
+  recommendation: string;
+  createdAt: string;
+};
+
 export type PagedResult<T> = {
   items: T[];
   page: number;
@@ -57,3 +74,5 @@ export type StepItem = {
   title: string;
   description: string;
 };
+
+export type WizardErrors = Partial<Record<StepKey, string>>;

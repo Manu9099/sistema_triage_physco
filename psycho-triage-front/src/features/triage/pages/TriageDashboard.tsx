@@ -1,23 +1,17 @@
 import { useMemo, useState } from "react";
-import {
-  defaultHistoryFilters,
-  defaultRequest,
-  designMeta,
-  gad7Questions,
-  phq9Questions,
-  steps,
-} from "../constants";
+import Panel from "../../../shared/ui/Panel";
+import StatusMessage from "../../../shared/ui/StatusMessage";
+import { defaultRequest, designMeta, gad7Questions, phq9Questions, steps } from "../constants";
+import { validateAll, validateStep } from "../lib/validation";
 import { evaluateTriage } from "../services/triageApi";
-import { useTriageHistory } from "../hooks/useTriageHistory";
-import type { HistoryFilters, TriageRequest, TriageResult } from "../types";
-import WizardSidebar from "../components/WizardSidebar";
+import type { StepKey, TriageRequest, TriageResult, WizardErrors } from "../types";
+import ResultSummary from "../components/ResultSummary";
 import WizardNavigation from "../components/WizardNavigation";
-import ResultPanel from "../components/ResultPanel";
-import HistoryPanel from "../components/HistoryPanel";
+import WizardSidebar from "../components/WizardSidebar";
 import StepGeneralInfo from "../components/steps/StepGeneralInfo";
 import StepQuestionnaire from "../components/steps/StepQuestionnaire";
-import StepRiskFlags from "../components/steps/StepRiskFlags";
 import StepReview from "../components/steps/StepReview";
+import StepRiskFlags from "../components/steps/StepRiskFlags";
 
 type RiskKey =
   | "suicidalIdeation"
@@ -50,14 +44,13 @@ function TopMetaBar() {
   );
 }
 
-export default function TriageDashboard() {
-  const [apiBaseUrl, setApiBaseUrl] = useState("http://localhost:5228");
+export default function TriageDashboardPage() {
   const [form, setForm] = useState<TriageRequest>(defaultRequest);
   const [result, setResult] = useState<TriageResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [filters, setFilters] = useState<HistoryFilters>(defaultHistoryFilters);
+  const [wizardErrors, setWizardErrors] = useState<WizardErrors>({});
 
   const phqScore = useMemo(
     () => form.phq9Answers.reduce((acc, value) => acc + value, 0),
@@ -67,11 +60,6 @@ export default function TriageDashboard() {
   const gadScore = useMemo(
     () => form.gad7Answers.reduce((acc, value) => acc + value, 0),
     [form.gad7Answers]
-  );
-
-  const { history, loadingHistory, historyError, reloadHistory } = useTriageHistory(
-    apiBaseUrl,
-    filters
   );
 
   function updatePhq(index: number, value: number) {
@@ -94,18 +82,28 @@ export default function TriageDashboard() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function patchFilters(patch: Partial<HistoryFilters>) {
-    setFilters((prev) => ({ ...prev, ...patch }));
-  }
-
   function resetForm() {
     setForm(defaultRequest);
     setResult(null);
     setError(null);
     setCurrentStep(0);
+    setWizardErrors({});
+  }
+
+  function stepKeyFromIndex(index: number): StepKey {
+    return steps[index].key;
   }
 
   function nextStep() {
+    const key = stepKeyFromIndex(currentStep);
+    const message = validateStep(key, form);
+
+    if (message) {
+      setWizardErrors((prev) => ({ ...prev, [key]: message }));
+      return;
+    }
+
+    setWizardErrors((prev) => ({ ...prev, [key]: undefined }));
     setCurrentStep((prev) => Math.min(steps.length - 1, prev + 1));
   }
 
@@ -114,13 +112,21 @@ export default function TriageDashboard() {
   }
 
   async function handleSubmit() {
+    const allErrors = validateAll(form);
+    setWizardErrors(allErrors);
+
+    const firstError = Object.values(allErrors).find(Boolean);
+    if (firstError) {
+      setError(firstError);
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
     try {
-      const data = await evaluateTriage(apiBaseUrl, form);
+      const data = await evaluateTriage(form);
       setResult(data);
-      await reloadHistory();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo evaluar el triage.");
     } finally {
@@ -176,88 +182,54 @@ export default function TriageDashboard() {
     }
   }
 
+  const currentStepError = wizardErrors[stepKeyFromIndex(currentStep)];
+
   return (
-    <div className="page-shell">
-      <div className="page-container">
-        <section className="panel">
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              flexWrap: "wrap",
-              marginBottom: 18,
-            }}
-          >
-            <div>
-              <h1 style={{ margin: 0, fontSize: "2rem" }}>Psycho Triage Wizard</h1>
-              <p style={{ marginTop: 6, color: "var(--text-muted)" }}>
-                Flujo guiado, resultado clínico y trazabilidad con historial.
-              </p>
-            </div>
+    <div className="page-grid-two">
+      <Panel className="page-full-span">
+        <TopMetaBar />
 
-            <div className="field" style={{ width: "100%", maxWidth: 360 }}>
-              <label className="label">API base URL</label>
-              <input
-                className="input"
-                value={apiBaseUrl}
-                onChange={(e) => setApiBaseUrl(e.target.value)}
-                placeholder="http://localhost:5228"
-              />
-            </div>
+        {(error || currentStepError) && (
+          <div className="dashboard-alert-wrap">
+            <StatusMessage kind="error" message={currentStepError ?? error!} />
           </div>
+        )}
 
-          <TopMetaBar />
+        <div className="layout-main dashboard-main-wrap">
+          <WizardSidebar
+            currentStep={currentStep}
+            onStepClick={setCurrentStep}
+            errors={wizardErrors}
+          />
 
-          {error && <div className="error-box" style={{ marginTop: 16 }}>{error}</div>}
-
-          <div className="layout-main" style={{ marginTop: 20 }}>
-            <WizardSidebar currentStep={currentStep} onStepClick={setCurrentStep} />
-
-            <div className="panel">
-              <div className="wizard-head">
-                <div>
-                  <div className="top-meta-label">{steps[currentStep].title}</div>
-                  <div style={{ fontSize: "1.6rem", fontWeight: 700 }}>
-                    {steps[currentStep].description}
-                  </div>
-                </div>
-
-                <span className="tag">
-                  PHQ-9: {phqScore} · GAD-7: {gadScore}
-                </span>
+          <Panel>
+            <div className="wizard-head">
+              <div>
+                <div className="top-meta-label">{steps[currentStep].title}</div>
+                <div className="wizard-title">{steps[currentStep].description}</div>
               </div>
 
-              {renderStep()}
-
-              <WizardNavigation
-                currentStep={currentStep}
-                totalSteps={steps.length}
-                submitting={submitting}
-                onReset={resetForm}
-                onPrevious={previousStep}
-                onNext={nextStep}
-                onSubmit={() => void handleSubmit()}
-              />
+              <span className="tag">
+                PHQ-9: {phqScore} · GAD-7: {gadScore}
+              </span>
             </div>
-          </div>
-        </section>
 
-        <div className="layout-bottom">
-          <ResultPanel result={result} />
+            {renderStep()}
 
-          <HistoryPanel
-            filters={filters}
-            history={history}
-            loadingHistory={loadingHistory}
-            historyError={historyError}
-            onFiltersChange={patchFilters}
-            onSearch={() => patchFilters({ page: 1 })}
-            onReload={() => void reloadHistory()}
-          />
+            <WizardNavigation
+              currentStep={currentStep}
+              totalSteps={steps.length}
+              submitting={submitting}
+              onReset={resetForm}
+              onPrevious={previousStep}
+              onNext={nextStep}
+              onSubmit={() => void handleSubmit()}
+            />
+          </Panel>
         </div>
-      </div>
+      </Panel>
+
+      <ResultSummary result={result} />
     </div>
   );
 }

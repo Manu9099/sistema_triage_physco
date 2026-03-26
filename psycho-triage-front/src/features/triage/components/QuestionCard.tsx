@@ -11,7 +11,7 @@ type Props = {
 export default function QuestionCard({ index, question, value, name, onChange }: Props) {
   return (
     <div className="section-card">
-      <p style={{ marginTop: 0, marginBottom: 12, fontWeight: 600 }}>
+      <p className="question-title">
         {index + 1}. {question}
       </p>
 
@@ -22,7 +22,7 @@ export default function QuestionCard({ index, question, value, name, onChange }:
           return (
             <label
               key={label}
-              className={["radio-pill", active ? "active" : ""].join(" ").trim()}
+              className={`radio-pill ${active ? "active" : ""}`.trim()}
             >
               <input
                 type="radio"

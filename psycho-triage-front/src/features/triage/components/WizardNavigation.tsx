@@ -1,3 +1,5 @@
+import Button from "../../../shared/ui/Button";
+
 type Props = {
   currentStep: number;
   totalSteps: number;
@@ -17,43 +19,35 @@ export default function WizardNavigation({
   onNext,
   onSubmit,
 }: Props) {
-  const lastStep = currentStep === totalSteps - 1;
+  const isLastStep = currentStep === totalSteps - 1;
 
   return (
     <div className="actions-row">
-      <div style={{ color: "var(--text-muted)", fontSize: "0.92rem" }}>
-        {lastStep
+      <div className="actions-hint">
+        {isLastStep
           ? "Todo listo para enviar la evaluación."
           : "Puedes avanzar o volver entre pasos sin perder datos."}
       </div>
 
       <div className="actions-group">
-        <button type="button" className="btn btn-secondary" onClick={onReset}>
+        <Button variant="secondary" onClick={onReset}>
           Reiniciar
-        </button>
+        </Button>
 
-        <button
-          type="button"
-          className="btn btn-secondary"
+        <Button
+          variant="secondary"
           onClick={onPrevious}
           disabled={currentStep === 0}
         >
           Anterior
-        </button>
+        </Button>
 
-        {!lastStep ? (
-          <button type="button" className="btn btn-primary" onClick={onNext}>
-            Siguiente
-          </button>
+        {!isLastStep ? (
+          <Button onClick={onNext}>Siguiente</Button>
         ) : (
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={onSubmit}
-            disabled={submitting}
-          >
+          <Button onClick={onSubmit} disabled={submitting}>
             {submitting ? "Evaluando..." : "Evaluar triage"}
-          </button>
+          </Button>
         )}
       </div>
     </div>

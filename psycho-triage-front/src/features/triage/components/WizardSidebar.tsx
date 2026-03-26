@@ -1,12 +1,14 @@
 import { steps } from "../constants";
+import type { WizardErrors } from "../types";
 import StepBadge from "./StepBadge";
 
 type Props = {
   currentStep: number;
   onStepClick: (index: number) => void;
+  errors: WizardErrors;
 };
 
-export default function WizardSidebar({ currentStep, onStepClick }: Props) {
+export default function WizardSidebar({ currentStep, onStepClick, errors }: Props) {
   return (
     <aside className="sidebar">
       <div className="sidebar-title">Progreso del flujo</div>
@@ -15,21 +17,23 @@ export default function WizardSidebar({ currentStep, onStepClick }: Props) {
         {steps.map((step, index) => {
           const active = index === currentStep;
           const done = index < currentStep;
+          const stepHasError = Boolean(errors[step.key]);
 
           return (
             <button
               key={step.key}
               type="button"
-              className={["step-button", active ? "active" : ""].join(" ").trim()}
+              className={`step-button ${active ? "active" : ""}`.trim()}
               onClick={() => onStepClick(index)}
             >
               <StepBadge index={index} active={active} done={done} />
 
               <div>
-                <div style={{ fontWeight: 700 }}>{step.title}</div>
-                <div style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                  {step.description}
+                <div className="step-title-row">
+                  <span className="step-title">{step.title}</span>
+                  {stepHasError && <span className="step-error-dot" />}
                 </div>
+                <div className="step-description">{step.description}</div>
               </div>
             </button>
           );

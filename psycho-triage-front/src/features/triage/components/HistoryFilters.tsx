@@ -1,4 +1,6 @@
 import { profileOptions, urgencyOptions } from "../constants";
+import Field from "../../../shared/ui/Field";
+import Button from "../../../shared/ui/Button";
 import type { HistoryFilters } from "../types";
 
 type Props = {
@@ -7,11 +9,14 @@ type Props = {
   onSearch: () => void;
 };
 
-export default function HistoryFiltersComponent({ filters, onChange, onSearch }: Props) {
+export default function HistoryFilters({
+  filters,
+  onChange,
+  onSearch,
+}: Props) {
   return (
     <div className="filter-grid">
-      <div className="field">
-        <label className="label">Urgencia</label>
+      <Field label="Urgencia">
         <select
           className="select"
           value={filters.urgencyLevel}
@@ -23,10 +28,9 @@ export default function HistoryFiltersComponent({ filters, onChange, onSearch }:
             </option>
           ))}
         </select>
-      </div>
+      </Field>
 
-      <div className="field">
-        <label className="label">Perfil</label>
+      <Field label="Perfil">
         <select
           className="select"
           value={filters.clinicalProfile}
@@ -38,29 +42,27 @@ export default function HistoryFiltersComponent({ filters, onChange, onSearch }:
             </option>
           ))}
         </select>
-      </div>
+      </Field>
 
-      <div className="field">
-        <label className="label">Fecha desde</label>
+      <Field label="Fecha desde">
         <input
           className="input"
           type="date"
           value={filters.dateFrom}
           onChange={(e) => onChange({ dateFrom: e.target.value, page: 1 })}
         />
-      </div>
+      </Field>
 
-      <div className="field">
-        <label className="label">Fecha hasta</label>
+      <Field label="Fecha hasta">
         <input
           className="input"
           type="date"
           value={filters.dateTo}
           onChange={(e) => onChange({ dateTo: e.target.value, page: 1 })}
         />
-      </div>
+      </Field>
 
-      <div className="field" style={{ gridColumn: "1 / -1" }}>
+      <div className="field filter-search-span">
         <label className="label">Búsqueda</label>
         <div className="search-row">
           <input
@@ -69,14 +71,11 @@ export default function HistoryFiltersComponent({ filters, onChange, onSearch }:
             value={filters.searchTerm}
             onChange={(e) => onChange({ searchTerm: e.target.value })}
           />
-          <button type="button" className="btn btn-primary" onClick={onSearch}>
-            Buscar
-          </button>
+          <Button onClick={onSearch}>Buscar</Button>
         </div>
       </div>
 
-      <div className="field">
-        <label className="label">Ordenar por</label>
+      <Field label="Ordenar por">
         <select
           className="select"
           value={filters.sortBy}
@@ -89,10 +88,9 @@ export default function HistoryFiltersComponent({ filters, onChange, onSearch }:
           <option value="urgencyLevel">Urgencia</option>
           <option value="clinicalProfile">Perfil</option>
         </select>
-      </div>
+      </Field>
 
-      <div className="field">
-        <label className="label">Dirección</label>
+      <Field label="Dirección">
         <select
           className="select"
           value={filters.sortDirection}
@@ -101,7 +99,7 @@ export default function HistoryFiltersComponent({ filters, onChange, onSearch }:
           <option value="desc">Descendente</option>
           <option value="asc">Ascendente</option>
         </select>
-      </div>
+      </Field>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import Field from "../../../../shared/ui/Field";
+
 type Props = {
   age: number;
   socialSupportLevel: number;
@@ -25,10 +27,9 @@ export default function StepGeneralInfo({
   onSupportChange,
 }: Props) {
   return (
-    <div style={{ display: "grid", gap: 24 }}>
+    <div className="step-stack">
       <div className="summary-grid">
-        <div className="field">
-          <label className="label">Edad</label>
+        <Field label="Edad">
           <input
             type="number"
             min={5}
@@ -37,10 +38,9 @@ export default function StepGeneralInfo({
             value={age}
             onChange={(e) => onAgeChange(Number(e.target.value))}
           />
-        </div>
+        </Field>
 
-        <div className="field">
-          <label className="label">Soporte social (0-10)</label>
+        <Field label="Soporte social (0-10)">
           <input
             type="range"
             min={0}
@@ -49,10 +49,8 @@ export default function StepGeneralInfo({
             value={socialSupportLevel}
             onChange={(e) => onSupportChange(Number(e.target.value))}
           />
-          <div style={{ color: "var(--text-muted)", fontSize: "0.92rem" }}>
-            Nivel actual: {socialSupportLevel}
-          </div>
-        </div>
+          <div className="helper-text">Nivel actual: {socialSupportLevel}</div>
+        </Field>
       </div>
 
       <div className="metrics-grid">

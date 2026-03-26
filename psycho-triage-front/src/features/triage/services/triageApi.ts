@@ -1,6 +1,8 @@
+import { env } from "../../../shared/config/env";
 import type {
   HistoryFilters,
   PagedResult,
+  TriageDetail,
   TriageListItem,
   TriageRequest,
   TriageResult,
@@ -11,11 +13,8 @@ async function parseError(response: Response): Promise<string> {
   return data?.detail || data?.title || "Ocurrió un error inesperado.";
 }
 
-export async function evaluateTriage(
-  apiBaseUrl: string,
-  payload: TriageRequest
-): Promise<TriageResult> {
-  const response = await fetch(`${apiBaseUrl}/api/Triage/evaluate`, {
+export async function evaluateTriage(payload: TriageRequest): Promise<TriageResult> {
+  const response = await fetch(`${env.apiBaseUrl}/api/Triage/evaluate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -28,7 +27,7 @@ export async function evaluateTriage(
   return response.json();
 }
 
-export function buildHistoryUrl(apiBaseUrl: string, filters: HistoryFilters): string {
+export function buildHistoryUrl(filters: HistoryFilters): string {
   const params = new URLSearchParams({
     page: String(filters.page),
     pageSize: String(filters.pageSize),
@@ -42,14 +41,23 @@ export function buildHistoryUrl(apiBaseUrl: string, filters: HistoryFilters): st
   if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
   if (filters.dateTo) params.set("dateTo", filters.dateTo);
 
-  return `${apiBaseUrl}/api/Triage?${params.toString()}`;
+  return `${env.apiBaseUrl}/api/Triage?${params.toString()}`;
 }
 
 export async function getTriageHistory(
-  apiBaseUrl: string,
   filters: HistoryFilters
 ): Promise<PagedResult<TriageListItem>> {
-  const response = await fetch(buildHistoryUrl(apiBaseUrl, filters));
+  const response = await fetch(buildHistoryUrl(filters));
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+
+  return response.json();
+}
+
+export async function getTriageById(id: number): Promise<TriageDetail> {
+  const response = await fetch(`${env.apiBaseUrl}/api/Triage/${id}`);
 
   if (!response.ok) {
     throw new Error(await parseError(response));
